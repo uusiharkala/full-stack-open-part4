@@ -3,9 +3,12 @@ const express = require('express')
 const bodyParser = require('body-parser')
 const app = express()
 const cors = require('cors')
+const middleware = require('./utils/middleware')
 const blogsRouter = require('./controllers/blogs')
+const usersRouter = require('./controllers/users')
 const mongoose = require('mongoose')
-const morgan = require('morgan')
+const loginRouter = require('./controllers/login')
+
 
 console.log('connecting to', config.MONGODB_URI)
 
@@ -21,13 +24,11 @@ app.use(cors())
 app.use(express.static('build'))
 app.use(bodyParser.json())
 
+app.use(middleware.tokenExtractor)
 app.use('/api/blogs', blogsRouter)
+app.use('/api/users', usersRouter)
+app.use('/api/login', loginRouter)
 
-morgan.token('body', (req) => {
-    return JSON.stringify(req.body)
-  })
-app.use(morgan(':method :url :status :res[content-length] - :response-time ms :body'))
 
-morgan
 
 module.exports = app
